@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TitleBar">
+        <!--标题文字-->
+        <attr format="string" name="titleText"/>
+        <!--标题文字大小-->
+        <attr format="dimension" name="titleSize"/>
+        <!--标题文字颜色-->
+        <attr format="color" name="titleColor"/>
+        <!--左边按钮图片-->
+        <attr format="reference" name="leftImg_drawable"/>
+        <!--右边按钮图片-->
+        <attr format="reference" name="rightImg_drawable"/>
+
+        <!--左侧图片padding-->
+        <attr format="dimension" name="leftImg_padding"/>
+        <attr format="dimension" name="leftImg_paddingLeft"/>
+        <attr format="dimension" name="leftImg_paddingRight"/>
+        <attr format="dimension" name="leftImg_paddingTop"/>
+        <attr format="dimension" name="leftImg_paddingBottom"/>
+
+        <!--左侧图片margin-->
+        <attr format="dimension" name="leftImg_margin"/>
+        <attr format="dimension" name="leftImg_marginLeft"/>
+        <attr format="dimension" name="leftImg_marginRight"/>
+        <attr format="dimension" name="leftImg_marginTop"/>
+        <attr format="dimension" name="leftImg_marginBottom"/>
+
+        <!--右侧图片padding-->
+        <attr format="dimension" name="rightImg_padding"/>
+        <attr format="dimension" name="rightImg_paddingLeft"/>
+        <attr format="dimension" name="rightImg_paddingRight"/>
+        <attr format="dimension" name="rightImg_paddingTop"/>
+        <attr format="dimension" name="rightImg_paddingBottom"/>
+
+        <!--右侧图片margin-->
+        <attr format="dimension" name="rightImg_margin"/>
+        <attr format="dimension" name="rightImg_marginLeft"/>
+        <attr format="dimension" name="rightImg_marginRight"/>
+        <attr format="dimension" name="rightImg_marginTop"/>
+        <attr format="dimension" name="rightImg_marginBottom"/>
+
+    </declare-styleable>
+    <string name="app_name">TitleBarLibrary</string>
+</resources>
