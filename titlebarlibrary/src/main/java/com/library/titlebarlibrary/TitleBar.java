@@ -1,12 +1,15 @@
 package com.library.titlebarlibrary;
 
+import android.app.Activity;
 import android.content.Context;
 
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
 
 import android.util.AttributeSet;
@@ -14,6 +17,8 @@ import android.util.Log;
 import android.view.Gravity;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import android.widget.ImageView;
@@ -22,12 +27,12 @@ import android.widget.TextView;
 /**
  * 封装的自定义titleBar
  * @author renlei
- * 2019/01/07
+ * create 2019/01/07
  */
 public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     /**
-     * 中间标题
+     *  中间标题
      */
     private TextView text_title;
 
@@ -40,6 +45,11 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
      * 布局管理，控制各个控件的位置
      */
     private LayoutParams params_left, params_right, params_title;
+
+    /**
+     * titleBar的背景颜色
+     */
+    private int backgroundColor;
 
     /**
      * 标题文字大小
@@ -180,6 +190,8 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     private void init(Context context, AttributeSet attrs) {
         setAttrs(context, attrs);
+
+        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
         //中间标题
         text_title = new TextView(context);
         text_title.setText(titleText);
@@ -221,14 +233,20 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         params_right.gravity = Gravity.CENTER_VERTICAL | Gravity.END;
         addView(img_right, params_right);
 
+        //background包括color和Drawable,这里分开取值
+        if (getBackground() instanceof ColorDrawable) {
+            ColorDrawable colordDrawable = (ColorDrawable) getBackground();
+            backgroundColor = colordDrawable.getColor();
+        }
+
         img_left.setOnClickListener(this);
         img_right.setOnClickListener(this);
         text_title.setOnClickListener(this);
+
     }
 
     /**
      * 自定义控件属性
-     *
      * @param context context
      * @param attrs   attrs
      */
@@ -267,7 +285,6 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         rightImg_marginTop = (int) array.getDimension(R.styleable.TitleBar_rightImg_marginTop, 0);
         rightImg_marginRight = (int) array.getDimension(R.styleable.TitleBar_rightImg_marginRight, 0);
         rightImg_marginBottom = (int) array.getDimension(R.styleable.TitleBar_rightImg_marginBottom, 0);
-
         array.recycle();
     }
 
@@ -319,5 +336,28 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         void onRightBtnClick(View view);
 
         void onTitleClick(View view);
+    }
+
+    /**
+     * 开启沉浸式
+     * @param activity 当前activity
+     */
+    public void startImmersive(Activity activity) {
+        //android 6.0 以上
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            activity.getWindow().setStatusBarColor(backgroundColor);
+        }
+        //android 4.4 -- 6.0
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //添加一个占位View
+            View view = new View(getContext());
+            view.setBackgroundColor(backgroundColor);
+            LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,50);
+            ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+            decorView.addView(view,params);
+        }
     }
 }
