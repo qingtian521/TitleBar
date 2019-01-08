@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         mTitleBar = (TitleBar) findViewById(R.id.title_bar);
+        mTitleBar.startImmersive(this);
         //点击事件
         mTitleBar.setOnTitleBarClickListener(new TitleBar.OnTitleBarClickListener() {
             @Override
