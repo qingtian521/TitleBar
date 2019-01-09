@@ -206,8 +206,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
     private void init(Context context, AttributeSet attrs) {
         setAttrs(context, attrs);
 
-//        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
-//        setBackground(backgroundDrable);
+        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
         //中间标题
         text_title = new TextView(context);
         text_title.setText(titleText);
@@ -404,7 +403,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         View statusView = null;
         if(backgroundDrable != null){
             statusView = createStatusView(activity, backgroundDrable);
-        }else if(backgroundColor != 0){
+        }else{
             statusView = createStatusView(activity, backgroundColor);
         }
         // 添加 statusView 到布局中
