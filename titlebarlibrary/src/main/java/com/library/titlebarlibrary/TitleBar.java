@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 /**
  * 封装的自定义titleBar
+ *
  * @author renlei
  * create 2019/01/07
  */
@@ -42,7 +43,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
     private static final int IMMERSIVE_TRANSLUCENT = 0x02;
 
     /**
-     *  中间标题
+     * 中间标题
      */
     private TextView text_title;
 
@@ -205,8 +206,6 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     private void init(Context context, AttributeSet attrs) {
         setAttrs(context, attrs);
-
-        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
         //中间标题
         text_title = new TextView(context);
         text_title.setText(titleText);
@@ -249,13 +248,15 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         addView(img_right, params_right);
 
         //background包括color和Drawable,这里分开取值
-        if (getBackground() instanceof ColorDrawable) {
-            ColorDrawable colordDrawable = (ColorDrawable) getBackground();
-            backgroundColor = colordDrawable.getColor();
+        if(getBackground() instanceof ColorDrawable){
+            backgroundColor =  ((ColorDrawable) getBackground()).getColor();
         }else {
             backgroundDrable = getBackground();
         }
 
+        if(backgroundColor == 0 && backgroundDrable == null){
+            setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
+        }
         img_left.setOnClickListener(this);
         img_right.setOnClickListener(this);
         text_title.setOnClickListener(this);
@@ -264,6 +265,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     /**
      * 自定义控件属性
+     *
      * @param context context
      * @param attrs   attrs
      */
@@ -358,86 +360,91 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     /**
      * 开启沉浸式
-     * @param activity 当前activity
+     *
+     * @param activity                   当前activity
      * @param flag:IMMERSIVE_TRANSPARENT 表示全透明状态 or IMMERSIVE_TRANSLUCENT 半透明状态 ,仅6.0以上可以生效
      */
-    public void startImmersive(Activity activity,int flag) {
-        setColor(activity,flag);
+    public void startImmersive(Activity activity, int flag) {
+        setColor(activity, flag);
     }
 
     /**
      * 开启沉浸式
+     *
      * @param activity 当前activity
      */
     public void startImmersive(Activity activity) {
-        setColor(activity,IMMERSIVE_TRANSPARENT);
+        setColor(activity, IMMERSIVE_TRANSPARENT);
     }
 
     /**
      * 开启沉浸式，适配 drawerLayout
-     * @param activity activity
+     *
+     * @param activity     activity
      * @param drawerLayout drawerLayout
      */
-    public void startImmersive(Activity activity, DrawerLayout drawerLayout){
-        setColor(activity,drawerLayout,IMMERSIVE_TRANSPARENT);
+    public void startImmersive(Activity activity, DrawerLayout drawerLayout) {
+        setColor(activity, drawerLayout, IMMERSIVE_TRANSPARENT);
     }
 
     /**
      * 设置状态栏颜色，适配drawerLayout
-     * @param activity 需要设置的activity
+     *
+     * @param activity     需要设置的activity
      * @param drawerLayout 适配drawerLayout
      */
-    public void setColor(Activity activity, DrawerLayout drawerLayout,int flag) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+    public void setColor(Activity activity, DrawerLayout drawerLayout, int flag) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_STABLE;
             activity.getWindow().getDecorView().setSystemUiVisibility(option);
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            if(flag == IMMERSIVE_TRANSPARENT){
+            if (flag == IMMERSIVE_TRANSPARENT) {
                 activity.getWindow().setStatusBarColor(backgroundColor);
             }
-        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // 设置状态栏透明
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         // 生成一个状态栏大小的矩形,优先drable
         View statusView = null;
-        if(backgroundDrable != null){
+        if (backgroundDrable != null) {
             statusView = createStatusView(activity, backgroundDrable);
-        }else{
+        } else {
             statusView = createStatusView(activity, backgroundColor);
         }
         // 添加 statusView 到布局中
         ViewGroup decorView = (ViewGroup) drawerLayout.getChildAt(0);
-        decorView.addView(statusView,0);
+        decorView.addView(statusView, 0);
         // 设置根布局的参数
     }
 
     /**
      * 设置状态栏颜色
+     *
      * @param activity 需要设置的activity
      */
     public void setColor(Activity activity, int flag) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_STABLE;
             activity.getWindow().getDecorView().setSystemUiVisibility(option);
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            if(flag == IMMERSIVE_TRANSPARENT){
+            if (flag == IMMERSIVE_TRANSPARENT) {
                 activity.getWindow().setStatusBarColor(backgroundColor);
             }
-        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // 设置状态栏透明
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         // 生成一个状态栏大小的矩形,优先drable
         View statusView = null;
-        if(backgroundDrable != null){
+        if (backgroundDrable != null) {
             statusView = createStatusView(activity, backgroundDrable);
-        }else{
+        } else {
             statusView = createStatusView(activity, backgroundColor);
         }
         // 添加 statusView 到布局中
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
-        decorView.addView(statusView,0);
+        decorView.addView(statusView, 0);
         // 设置根布局的参数
         ViewGroup rootView = (ViewGroup) ((ViewGroup) activity.findViewById(android.R.id.content)).getChildAt(0);
         rootView.setFitsSystemWindows(true);
@@ -446,6 +453,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     /**
      * 生成一个和状态栏大小相同的矩形条
+     *
      * @param activity 需要设置的activity
      * @param color    状态栏颜色值
      * @return 状态栏矩形条
@@ -466,8 +474,9 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
 
     /**
      * 生成一个和状态栏大小相同的矩形条
+     *
      * @param activity 需要设置的activity
-     * @param drawable    状态栏资源文件
+     * @param drawable 状态栏资源文件
      * @return 状态栏矩形条
      */
 
