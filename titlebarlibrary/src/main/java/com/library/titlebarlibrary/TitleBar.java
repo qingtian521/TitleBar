@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 
+import android.support.v4.widget.DrawerLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -59,6 +60,11 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
      * titleBar的背景颜色
      */
     private int backgroundColor;
+
+    /**
+     * titleBar的背景图片
+     */
+    private Drawable backgroundDrable;
 
     /**
      * 标题文字大小
@@ -200,7 +206,8 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
     private void init(Context context, AttributeSet attrs) {
         setAttrs(context, attrs);
 
-        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
+//        setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
+//        setBackground(backgroundDrable);
         //中间标题
         text_title = new TextView(context);
         text_title.setText(titleText);
@@ -246,6 +253,8 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         if (getBackground() instanceof ColorDrawable) {
             ColorDrawable colordDrawable = (ColorDrawable) getBackground();
             backgroundColor = colordDrawable.getColor();
+        }else {
+            backgroundDrable = getBackground();
         }
 
         img_left.setOnClickListener(this);
@@ -340,6 +349,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
      * 点击事件回调类
      */
     public interface OnTitleBarClickListener {
+
         void onLeftBtnClick(View view);
 
         void onRightBtnClick(View view);
@@ -353,7 +363,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
      * @param flag:IMMERSIVE_TRANSPARENT 表示全透明状态 or IMMERSIVE_TRANSLUCENT 半透明状态 ,仅6.0以上可以生效
      */
     public void startImmersive(Activity activity,int flag) {
-        setColor(activity,backgroundColor,flag);
+        setColor(activity,flag);
     }
 
     /**
@@ -361,16 +371,24 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
      * @param activity 当前activity
      */
     public void startImmersive(Activity activity) {
-        setColor(activity,backgroundColor,IMMERSIVE_TRANSPARENT);
+        setColor(activity,IMMERSIVE_TRANSPARENT);
     }
 
     /**
-     * 设置状态栏颜色
-     * @param activity 需要设置的activity
-     * @param color    状态栏颜色值
+     * 开启沉浸式，适配 drawerLayout
+     * @param activity activity
+     * @param drawerLayout drawerLayout
      */
-    public void setColor(Activity activity, int color,int flag) {
+    public void startImmersive(Activity activity, DrawerLayout drawerLayout){
+        setColor(activity,drawerLayout,IMMERSIVE_TRANSPARENT);
+    }
 
+    /**
+     * 设置状态栏颜色，适配drawerLayout
+     * @param activity 需要设置的activity
+     * @param drawerLayout 适配drawerLayout
+     */
+    public void setColor(Activity activity, DrawerLayout drawerLayout,int flag) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_STABLE;
             activity.getWindow().getDecorView().setSystemUiVisibility(option);
@@ -382,11 +400,45 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
             // 设置状态栏透明
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-        // 生成一个状态栏大小的矩形
-        View statusView = createStatusView(activity, color);
+        // 生成一个状态栏大小的矩形,优先drable
+        View statusView = null;
+        if(backgroundDrable != null){
+            statusView = createStatusView(activity, backgroundDrable);
+        }else if(backgroundColor != 0){
+            statusView = createStatusView(activity, backgroundColor);
+        }
+        // 添加 statusView 到布局中
+        ViewGroup decorView = (ViewGroup) drawerLayout.getChildAt(0);
+        decorView.addView(statusView,0);
+        // 设置根布局的参数
+    }
+
+    /**
+     * 设置状态栏颜色
+     * @param activity 需要设置的activity
+     */
+    public void setColor(Activity activity, int flag) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            activity.getWindow().getDecorView().setSystemUiVisibility(option);
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            if(flag == IMMERSIVE_TRANSPARENT){
+                activity.getWindow().setStatusBarColor(backgroundColor);
+            }
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // 设置状态栏透明
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        // 生成一个状态栏大小的矩形,优先drable
+        View statusView = null;
+        if(backgroundDrable != null){
+             statusView = createStatusView(activity, backgroundDrable);
+        }else if(backgroundColor != 0){
+             statusView = createStatusView(activity, backgroundColor);
+        }
         // 添加 statusView 到布局中
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
-        decorView.addView(statusView);
+        decorView.addView(statusView,0);
         // 设置根布局的参数
         ViewGroup rootView = (ViewGroup) ((ViewGroup) activity.findViewById(android.R.id.content)).getChildAt(0);
         rootView.setFitsSystemWindows(true);
@@ -410,6 +462,26 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
                 statusBarHeight);
         statusView.setLayoutParams(params);
         statusView.setBackgroundColor(color);
+        return statusView;
+    }
+
+    /**
+     * 生成一个和状态栏大小相同的矩形条
+     * @param activity 需要设置的activity
+     * @param drawable    状态栏资源文件
+     * @return 状态栏矩形条
+     */
+
+    private View createStatusView(Activity activity, Drawable drawable) {
+        // 获得状态栏高度
+        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int statusBarHeight = activity.getResources().getDimensionPixelSize(resourceId);
+        // 绘制一个和状态栏一样高的矩形
+        View statusView = new View(activity);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                statusBarHeight);
+        statusView.setLayoutParams(params);
+        statusView.setBackground(drawable);
         return statusView;
     }
 }
