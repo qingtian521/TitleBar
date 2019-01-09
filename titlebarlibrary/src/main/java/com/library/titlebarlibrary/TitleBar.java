@@ -431,9 +431,9 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         // 生成一个状态栏大小的矩形,优先drable
         View statusView = null;
         if(backgroundDrable != null){
-             statusView = createStatusView(activity, backgroundDrable);
-        }else if(backgroundColor != 0){
-             statusView = createStatusView(activity, backgroundColor);
+            statusView = createStatusView(activity, backgroundDrable);
+        }else{
+            statusView = createStatusView(activity, backgroundColor);
         }
         // 添加 statusView 到布局中
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
