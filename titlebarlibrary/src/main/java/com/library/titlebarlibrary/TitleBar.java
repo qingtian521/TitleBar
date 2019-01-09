@@ -257,6 +257,7 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         if(backgroundColor == 0 && backgroundDrable == null){
             setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
         }
+
         img_left.setOnClickListener(this);
         img_right.setOnClickListener(this);
         text_title.setOnClickListener(this);
