@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 /**
  * 封装的自定义titleBar
- *
  * @author renlei
  * create 2019/01/07
  */
@@ -255,7 +254,8 @@ public class TitleBar extends FrameLayout implements View.OnClickListener {
         }
 
         if(backgroundColor == 0 && backgroundDrable == null){
-            setBackgroundColor(getResources().getColor(R.color.colorPrimary)); //默认状态栏颜色
+            backgroundColor = getResources().getColor(R.color.colorPrimary);
+            setBackgroundColor(backgroundColor); //默认状态栏颜色
         }
 
         img_left.setOnClickListener(this);
